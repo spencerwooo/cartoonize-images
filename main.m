@@ -1,27 +1,25 @@
 imgPath = 'image2.jpg';
-
-saturation = 0.8;
-
-edgeThreshhold = 0.05;
-edgeDetector = 'canny';
-
-sigma = 7;
-
 img = imread(imgPath);
 
-% figure(1)
-% imshow(img);
+saturation = 2;
+edgeThreshhold = 0.2;
+edgeDetector = 'canny';
+sigma = 7;
+
+faceDetector = vision.CascadeObjectDetector();
+bbox = step(faceDetector, img);
+if isempty(bbox) == 1
+    disp('[No face detected]')
+else
+    saturation = 0.8;
+    edgeThreshhold = 0.1;
+    sigma = 4;
+    disp('[Face detected]');
+end
 
 % 1. Saturate
 % Add a degree of saturation, to make image colors more vibrant
 imgSaturated = saturateImage(img, saturation);
-
-faceDetector = vision.CascadeObjectDetector();
-shapeInserter = vision.ShapeInserter('BorderColor','Custom','CustomBorderColor',[0 255 255]);
-bbox = step(faceDetector, imgSaturated);
-disp(bbox)
-% Draw boxes around detected faces and display results
-I_faces = step(shapeInserter, imgSaturated, int32(bbox));
 
 % 2. Bilateral filter
 % Convert the image to the L*a*b colorspace
@@ -47,7 +45,5 @@ resultImg(:,:,2) = smoothedRBGImg(:,:,2) - smoothedRBGImg(:,:,2) .* edgeMask;
 resultImg(:,:,3) = smoothedRBGImg(:,:,3) - smoothedRBGImg(:,:,3) .* edgeMask;
 
 % Display result
-montage({I_faces, resultImg})
+montage({img, resultImg})
 title('Original Image vs. Filtered Image');
-% figure(2)
-% imshow(resultImg);
