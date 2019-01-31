@@ -1,27 +1,45 @@
-imgPath = 'image2.jpg';
-img = imread(imgPath);
+answer = questdlg('Do I fetch the image from local folder or webcam?', ...
+    'Question', ...
+	'Local image', 'Webcam', 'Local image');
+% Handle response
+switch answer
+    case 'Local image'
+        % Load images from local folder
+        imgPath = 'image2.jpg';
+        img = imread(imgPath);
+    case 'Webcam'        
+        % Get snapshot from webcam
+        url = 'http://192.168.1.7:8080/video';
+        cam = ipcam(url);
+        img = snapshot(cam);
+end
 
-saturation = 2;
-edgeThreshhold = 0.2;
+f = waitbar(0, 'Loading images...');
+saturation = 1.5;
+edgeThreshold = 0.15;
 edgeDetector = 'canny';
-sigma = 7;
+sigma = 10;
 
+f = waitbar(0.25, f, 'Detecting faces...');
 faceDetector = vision.CascadeObjectDetector();
 bbox = step(faceDetector, img);
+disp(bbox)
 if isempty(bbox) == 1
     disp('[No face detected]')
 else
     saturation = 0.8;
-    edgeThreshhold = 0.1;
-    sigma = 4;
+    edgeThreshold = 0.2;
+    sigma = 5;
     disp('[Face detected]');
 end
 
 % 1. Saturate
 % Add a degree of saturation, to make image colors more vibrant
+waitbar(0.5, f, 'Adding saturation...');
 imgSaturated = saturateImage(img, saturation);
 
 % 2. Bilateral filter
+waitbar(0.75, f, 'Smoothing colors...');
 % Convert the image to the L*a*b colorspace
 imgLAB = rgb2lab(imgSaturated);
 % Extract an L*a*b patch that contains no sharp edges
@@ -36,8 +54,9 @@ smoothedLABImg = imbilatfilt(imgLAB, smoothness, sigma);
 smoothedRBGImg = lab2rgb(smoothedLABImg, 'Out', 'uint8');
 
 % 3. Highlight edges
+waitbar(0.95, f, 'Adding edges...');
 imgGray = rgb2gray(smoothedRBGImg);
-edgeMask = uint8(edge(imgGray, edgeDetector, edgeThreshhold));
+edgeMask = uint8(edge(imgGray, edgeDetector, edgeThreshold));
 
 % Highlight edges using black color.
 resultImg(:,:,1) = smoothedRBGImg(:,:,1) - smoothedRBGImg(:,:,1) .* edgeMask;
@@ -47,3 +66,5 @@ resultImg(:,:,3) = smoothedRBGImg(:,:,3) - smoothedRBGImg(:,:,3) .* edgeMask;
 % Display result
 montage({img, resultImg})
 title('Original Image vs. Filtered Image');
+close(f);
+clear cam;
