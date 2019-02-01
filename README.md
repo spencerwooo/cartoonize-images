@@ -30,7 +30,7 @@ Cartoonize image with MATLAB.
 ## Usage
 
 1. Open `main.m` in MATLAB
-2. Configure settings in line 4-5, with your own local image, or your IP camera's video stream url
+2. Configure settings in line 4-5, with your own local image, or your IP camera's video stream url
 
 ```matlab
 % % % % % % % % % % % % % % % % % % % % % % % % % 
@@ -40,7 +40,11 @@ imgPath = '1.jpg';
 url = 'http://192.168.1.7:8080/video';
 ```
 
-3. Run the program
+1. Run the program
+
+## Expected Result
+
+![](https://i.loli.net/2019/02/02/5c54a5e5556da.jpg)
 
 ---
 
