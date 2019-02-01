@@ -1,3 +1,10 @@
+% % % % % % % % % % % % % % % % % % % % % % % % % 
+% Change below according to your configurations %
+% % % % % % % % % % % % % % % % % % % % % % % % % 
+imgPath = '1.jpg';
+url = 'http://192.168.1.7:8080/video';
+
+% Prompt question: form of input
 answer = questdlg('Do I fetch the image from local folder or webcam?', ...
     'Question', ...
 	'Local image', 'Webcam', 'Local image');
@@ -5,11 +12,9 @@ answer = questdlg('Do I fetch the image from local folder or webcam?', ...
 switch answer
     case 'Local image'
         % Load images from local folder
-        imgPath = 'image2.jpg';
         img = imread(imgPath);
     case 'Webcam'        
         % Get snapshot from webcam
-        url = 'http://192.168.1.7:8080/video';
         cam = ipcam(url);
         img = snapshot(cam);
 end
